@@ -879,8 +879,7 @@ void SurfaceFlinger::bootFinished() {
 
 bool shouldUseGraphiteIfSupported() {
     return FlagManager::getInstance().graphite_renderengine() ||
-            (FlagManager::getInstance().graphite_renderengine_preview_rollout() &&
-             base::GetBoolProperty(PROPERTY_DEBUG_RENDERENGINE_GRAPHITE_PREVIEW_OPTIN, false)) ||
+            base::GetBoolProperty(PROPERTY_DEBUG_RENDERENGINE_GRAPHITE_PREVIEW_OPTIN, false) ||
             (FlagManager::getInstance().graphite_renderengine_preview2_rollout() &&
              base::GetBoolProperty(PROPERTY_DEBUG_RENDERENGINE_GRAPHITE_PREVIEW2_OPTIN, false)) ||
             (FlagManager::getInstance().graphite_renderengine_desktop_rollout() &&
@@ -907,11 +906,9 @@ void chooseRenderEngineType(renderengine::RenderEngineCreationArgs::Builder& bui
                 .setGraphicsApi(renderengine::RenderEngine::GraphicsApi::Vk);
     } else {
         const auto kVulkan = renderengine::RenderEngine::GraphicsApi::Vk;
-        const bool useGraphite =
-                shouldUseGraphiteIfSupported() && renderengine::RenderEngine::canSupport(kVulkan);
-        const bool useVulkan = useGraphite ||
-                (FlagManager::getInstance().vulkan_renderengine() &&
-                 renderengine::RenderEngine::canSupport(kVulkan));
+        const bool canSupportVulkan = renderengine::RenderEngine::canSupport(kVulkan);
+        const bool useGraphite = shouldUseGraphiteIfSupported() && canSupportVulkan;
+        const bool useVulkan = useGraphite || canSupportVulkan;
 
         builder.setSkiaBackend(useGraphite ? renderengine::RenderEngine::SkiaBackend::Graphite
                                            : renderengine::RenderEngine::SkiaBackend::Ganesh);
@@ -10966,6 +10963,7 @@ status_t SurfaceComposerAIDL::checkReadFrameBufferPermission() {
     static const std::unordered_set<std::string> sExemptLaunchers = {
         "com.google.android.apps.nexuslauncher",
         "com.android.launcher3",
+        "dev.launcher.expressive.l3",
     };
 
     if (sExemptLaunchers.count(processName) != 0) {
