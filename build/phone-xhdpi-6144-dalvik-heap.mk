@@ -14,12 +14,21 @@
 # limitations under the License.
 #
 
-# Provides overrides to configure the Dalvik heap for a 6GB phone
+# Provides overrides to configure the Dalvik heap for a 6GB+ phone
 
-PRODUCT_VENDOR_PROPERTIES += \
+PRODUCT_PRODUCT_PROPERTIES += \
     dalvik.vm.heapstartsize?=16m \
-    dalvik.vm.heapgrowthlimit?=256m \
+    dalvik.vm.heapgrowthlimit?=384m \
     dalvik.vm.heapsize?=512m \
     dalvik.vm.heaptargetutilization?=0.5 \
     dalvik.vm.heapminfree?=8m \
-    dalvik.vm.heapmaxfree?=32m
+    dalvik.vm.heapmaxfree?=32m \
+    dalvik.vm.enable_time_based_gc_trigger?=true \
+    dalvik.vm.jitmaxsize?=128m \
+    dalvik.vm.jitinitialsize?=16m \
+    dalvik.vm.parallel-image-loading?=true \
+    dalvik.vm.madvise.vdexfile.size?=104857600 \
+    dalvik.vm.madvise.odexfile.size?=104857600 \
+    dalvik.vm.usap_pool_enabled?=true \
+    dalvik.vm.usap_pool_size_max?=3 \
+    dalvik.vm.usap_pool_size_min?=1
